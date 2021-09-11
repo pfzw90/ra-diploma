@@ -8,37 +8,53 @@ import Loader from '../../loader/Loader.jsx';
 import Item from './Item.jsx';
 
 function Items() {
-  const { itemsList, itemsState } = useSelector((state) => state.items);
-  const { q, categoryId } = useSelector((state) => state.filter);
+  const { itemsList, itemsState, lastFetched } = useSelector((state) => state.items);
+  const { q, categoryId, offset } = useSelector((state) => state.filter);
   const dispatch = useDispatch();
+  const params = {};
+  if (q) params.q = q;
+  if (categoryId) params.categoryId = categoryId;
+  const loadButton = (offset > 0 && offset % 6 === 0 && lastFetched);
 
   React.useEffect(() => {
-    const params = {};
-    if (q) params.q = q;
-    if (categoryId) params.categoryId = categoryId;
     dispatch(resetOffset());
     dispatch(resetItems());
     dispatch(fetchData(process.env.REACT_APP_ITEMS_URL, getItems, params));
   }, [dispatch, categoryId, q]);
 
-  switch (itemsState) {
-    case 'idle':
-      return (
-        <React.Fragment>
+  const handleLoadMore = () => {
+    dispatch(fetchData(process.env.REACT_APP_ITEMS_URL, getItems, { ...params, offset }));
+  };
 
-                <div class="row">
-                { itemsList.map((i) => (
-                <Item key={nanoid()}
-                title={i.title} price={i.price} id={i.id} img={i.images}/>)) }
-                </div>
+  return (
+   <React.Fragment>
+       { (itemsList.length > 0) ? (
 
-        </React.Fragment>
-      );
-    case 'loading':
-      return <Loader/>;
-    default:
-      return <div className="error">{itemsState}</div>;
-  }
+                <><div className="row">
+           {itemsList.map((i) => (
+             <Item key={nanoid()}
+               title={i.title} price={i.price} id={i.id} img={i.images} />))}
+         </div><>
+             {(loadButton) ? (<div className="text-center">
+               <button className="btn btn-outline-primary" onClick={() => handleLoadMore()}>Загрузить ещё</button>
+             </div>) : (null)}
+           </></>
+
+       ) : (null) }
+
+      {
+        itemsState === 'loading'
+          ? (<Loader/>) : null
+      }
+
+      {
+        itemsState.startsWith('error')
+          ? (<div className="error">{itemsState}</div>) : null
+      }
+
+  </React.Fragment>
+
+  );
 }
 
 const mapStateToProps = (state) => {
@@ -54,6 +70,7 @@ const mapDispatchToProps = (dispatch) => ({
   resetOffset: () => dispatch(resetOffset()),
   resetCategory: () => dispatch(resetCategory()),
   resetItems: () => dispatch(resetItems()),
+  loadMore: () => dispatch(),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Items);
