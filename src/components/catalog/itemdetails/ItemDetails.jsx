@@ -8,6 +8,7 @@ import {
   selectSize,
 } from '../../../actions/actionCreators';
 import Loader from '../../loader/Loader.jsx';
+import LoadButton from '../items/loadButton.jsx';
 
 function ItemDetails(props) {
   const {
@@ -15,8 +16,12 @@ function ItemDetails(props) {
   } = useSelector((state) => state.item);
   const dispatch = useDispatch();
 
-  React.useEffect(() => {
+  const firstLoad = () => {
     dispatch(fetchData(`${process.env.REACT_APP_ITEMS_URL}/${props.match.params.id}`, getItemDetails));
+  };
+
+  React.useEffect(() => {
+    firstLoad();
   }, [dispatch, props.match.params.id]);
 
   const handleIncQuantity = () => {
@@ -96,7 +101,7 @@ function ItemDetails(props) {
     case 'loading':
       return <Loader/>;
     default:
-      return <div className="error">{itemState}</div>;
+      return <LoadButton currentState={itemState} fn={firstLoad}/>;
   }
 }
 

@@ -2,10 +2,11 @@ import { useDispatch, useSelector, connect } from 'react-redux';
 import React from 'react';
 import { nanoid } from '@reduxjs/toolkit';
 import {
-  fetchData, resetCategory, resetOffset, getItems, resetItems,
+  fetchData, resetOffset, getItems, resetItems,
 } from '../../../actions/actionCreators';
-import Loader from '../../loader/Loader.jsx';
 import Item from './Item.jsx';
+import LoadButton from './loadButton.jsx';
+import Loader from '../../loader/Loader.jsx';
 
 function Items() {
   const { itemsList, itemsState, lastFetched } = useSelector((state) => state.items);
@@ -14,44 +15,37 @@ function Items() {
   const params = {};
   if (q) params.q = q;
   if (categoryId) params.categoryId = categoryId;
-  const loadButton = (offset > 0 && offset % 6 === 0 && lastFetched);
+  const loadMore = (offset > 0 && offset % 6 === 0 && lastFetched);
 
-  React.useEffect(() => {
+  const firstLoad = () => {
     dispatch(resetOffset());
     dispatch(resetItems());
     dispatch(fetchData(process.env.REACT_APP_ITEMS_URL, getItems, params));
+  };
+
+  React.useEffect(() => {
+    firstLoad();
   }, [dispatch, categoryId, q]);
 
-  const handleLoadMore = () => {
+  const nextLoad = () => {
     dispatch(fetchData(process.env.REACT_APP_ITEMS_URL, getItems, { ...params, offset }));
   };
 
   return (
-   <React.Fragment>
-       { (itemsList.length > 0) ? (
+  <React.Fragment>
+    { (itemsList.length > 0) ? (
+                <div className="row">
+                {itemsList.map((i) => (
+                <Item key={nanoid()}
+                  title={i.title} price={i.price} id={i.id} img={i.images} />))}
+                </div>
+    ) : (null) }
 
-                <><div className="row">
-           {itemsList.map((i) => (
-             <Item key={nanoid()}
-               title={i.title} price={i.price} id={i.id} img={i.images} />))}
-         </div><>
-             {(loadButton) ? (<div className="text-center">
-               <button className="btn btn-outline-primary" onClick={() => handleLoadMore()}>Загрузить ещё</button>
-             </div>) : (null)}
-           </></>
+    {!lastFetched && itemsState === 'loading' ? <Loader/> : null}
 
-       ) : (null) }
-
-      {
-        itemsState === 'loading'
-          ? (<Loader/>) : null
-      }
-
-      {
-        itemsState.startsWith('error')
-          ? (<div className="error">{itemsState}</div>) : null
-      }
-
+    <LoadButton fn={(loadMore ? nextLoad : firstLoad)}
+                  currentState={itemsState}
+                  lastFetched={lastFetched}/>
   </React.Fragment>
 
   );
@@ -68,9 +62,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => ({
   fetchData: (url, fn, opts) => dispatch(fetchData(url, fn, opts)),
   resetOffset: () => dispatch(resetOffset()),
-  resetCategory: () => dispatch(resetCategory()),
   resetItems: () => dispatch(resetItems()),
-  loadMore: () => dispatch(),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Items);
