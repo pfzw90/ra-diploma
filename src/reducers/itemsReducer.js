@@ -9,7 +9,6 @@ const initialState = {
 export default function itemsReducer(state = initialState, action) {
   switch (action.type) {
     case GET_ITEMS:
-      if (action.payload.data) console.log(action.payload.data.length);
       return {
         itemsState: action.payload.itemsState,
         itemsList: action.payload.data

@@ -45,7 +45,7 @@ function Items() {
 
     <LoadButton fn={(loadMore ? nextLoad : firstLoad)}
                   currentState={itemsState}
-                  lastFetched={lastFetched}/>
+                  lastFetched={lastFetched} key={nanoid()}/>
   </React.Fragment>
 
   );

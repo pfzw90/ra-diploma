@@ -5,14 +5,19 @@ import {
   fetchData, changeCategory, resetCategory, getCategories,
 } from '../../../actions/actionCreators';
 import Loader from '../../loader/Loader.jsx';
+import LoadButton from '../items/loadButton.jsx';
 
 function Categories(props) {
   const { categoriesList, categoriesState } = useSelector((state) => state.categories);
   const { categoryId } = useSelector((state) => state.filter);
   const dispatch = useDispatch();
 
-  React.useEffect(() => {
+  const firstLoad = () => {
     dispatch(fetchData(process.env.REACT_APP_CATEGORIES_URL, getCategories));
+  };
+
+  React.useEffect(() => {
+    firstLoad();
   }, [dispatch]);
 
   const handleClick = (id) => {
@@ -45,7 +50,7 @@ function Categories(props) {
     case 'loading':
       return <Loader/>;
     default:
-      return <div className="error">{categoriesState}</div>;
+      return <div className="error"><LoadButton currentState={categoriesState} fn={firstLoad}/> </div>;
   }
 }
 
