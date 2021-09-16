@@ -8,7 +8,7 @@ export default function Catalog() {
   <React.Fragment>
   <section className="catalog">
     <h2 className="text-center">Каталог</h2>
-    <Search prefix="catalog"/>
+    <Search prefix="catalog" />
     <Categories/>
     <Items/>
   </section>

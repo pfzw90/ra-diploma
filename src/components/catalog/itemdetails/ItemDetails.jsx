@@ -8,7 +8,7 @@ import {
   selectSize,
 } from '../../../actions/actionCreators';
 import Loader from '../../loader/Loader.jsx';
-import LoadButton from '../items/loadButton.jsx';
+import LoadButton from '../../loadbutton/loadButton.jsx';
 
 function ItemDetails(props) {
   const {

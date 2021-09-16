@@ -5,7 +5,7 @@ import {
   fetchData, changeCategory, resetCategory, getCategories,
 } from '../../../actions/actionCreators';
 import Loader from '../../loader/Loader.jsx';
-import LoadButton from '../items/loadButton.jsx';
+import LoadButton from '../../loadbutton/loadButton.jsx';
 
 function Categories(props) {
   const { categoriesList, categoriesState } = useSelector((state) => state.categories);
@@ -50,7 +50,7 @@ function Categories(props) {
     case 'loading':
       return <Loader/>;
     default:
-      return <div className="error"><LoadButton currentState={categoriesState} fn={firstLoad}/> </div>;
+      return <LoadButton currentState={categoriesState} fn={firstLoad}/>;
   }
 }
 

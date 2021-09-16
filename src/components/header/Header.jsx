@@ -31,7 +31,7 @@ function Header({ location }) {
                         </ul>
                         <div>
                             <div className="header-controls-pics">
-                                <Search header prefix="header-controls"/>
+                                <Search header="true" prefix="header-controls"/>
                                 <div className="header-controls-pic header-controls-cart">
                                     <div className="header-controls-cart-full">1</div>
                                     <div className="header-controls-cart-menu"></div>

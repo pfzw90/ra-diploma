@@ -1,10 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import {
   changeSearch, toggleSearchOpacity, initSearch, resetQuery,
 } from '../../actions/actionCreators';
 
 function Search(props) {
+  const searchInput = React.createRef();
+
+  useEffect(() => {
+    if (!props.hidden && props.header) searchInput.current.focus();
+  }, [props]);
+
   const handleChange = (ev) => {
     const { value } = ev.target;
     props.onChange(value);
@@ -22,7 +28,7 @@ function Search(props) {
   };
 
   const onLeave = () => {
-    props.onLeave(props.value);
+    props.onLeave(props.value, props.header);
   };
 
   return (
@@ -30,7 +36,7 @@ function Search(props) {
     {props.header ? (<div data-id="search-expander" className="header-controls-pic header-controls-search" onClick={handleClick}></div>) : null}
     <form data-id="search-form" className={`${props.prefix}-search-form form-inline ${(props.hidden && props.header) ? 'invisible' : ''}`}
           onSubmit={handleSubmit}>
-        <input className="form-control" placeholder="Поиск" value={props.value} onChange={handleChange} name="search" onBlur={onLeave}/>
+        <input className="form-control" placeholder="Поиск" value={props.value} onChange={handleChange} name="search" onBlur={onLeave} ref={(input) => { (searchInput.current = input); }}/>
     </form>
     </React.Fragment>
   );
@@ -51,8 +57,8 @@ const mapDispatchToProps = (dispatch) => ({
     if (!value.length) dispatch(resetQuery());
     else dispatch(initSearch(value));
   },
-  onLeave: (value) => {
-    if (!value) dispatch(toggleSearchOpacity());
+  onLeave: (value, header) => {
+    if (!value && header) dispatch(toggleSearchOpacity());
   },
 });
 

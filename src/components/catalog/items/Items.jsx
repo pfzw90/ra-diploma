@@ -5,7 +5,7 @@ import {
   fetchData, resetOffset, getItems, resetItems,
 } from '../../../actions/actionCreators';
 import Item from './Item.jsx';
-import LoadButton from './loadButton.jsx';
+import LoadButton from '../../loadbutton/loadButton.jsx';
 import Loader from '../../loader/Loader.jsx';
 
 function Items() {
@@ -18,13 +18,15 @@ function Items() {
   const loadMore = (offset > 0 && offset % 6 === 0 && lastFetched);
 
   const firstLoad = () => {
-    dispatch(resetOffset());
-    dispatch(resetItems());
     dispatch(fetchData(process.env.REACT_APP_ITEMS_URL, getItems, params));
   };
 
   React.useEffect(() => {
     firstLoad();
+    return () => {
+      dispatch(resetOffset());
+      dispatch(resetItems());
+    };
   }, [dispatch, categoryId, q]);
 
   const nextLoad = () => {
@@ -33,29 +35,34 @@ function Items() {
 
   return (
   <React.Fragment>
-    { (itemsList.length > 0) ? (
+    { (itemsList.length > 0 && itemsState === 'idle') ? (
                 <div className="row">
                 {itemsList.map((i) => (
                 <Item key={nanoid()}
                   title={i.title} price={i.price} id={i.id} img={i.images} />))}
                 </div>
-    ) : (null) }
+    ) : null }
+
+    {(itemsList.length === 0 && itemsState === 'idle')
+      ? (<div className="alert alert-light" role="alert">По Вашему запросу{(q) ? ` "${q}" ` : ''} ничего не найдено.</div>) : null
+    }
 
     {!lastFetched && itemsState === 'loading' ? <Loader/> : null}
 
     <LoadButton fn={(loadMore ? nextLoad : firstLoad)}
                   currentState={itemsState}
-                  lastFetched={lastFetched} key={nanoid()}/>
+                  fetched={lastFetched} more={loadMore} key={nanoid()}/>
   </React.Fragment>
 
   );
 }
 
 const mapStateToProps = (state) => {
-  const { itemsList, itemsState } = state.items;
+  const { itemsList, itemsState, lastFetched } = state.items;
   return {
     itemsList,
     itemsState,
+    lastFetched,
   };
 };
 
