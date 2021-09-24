@@ -27,6 +27,7 @@ export default function ItemImage(props) {
         if (imgOk) setImageState(({ img: props.img[i], state: 'idle' }));
       }
     }
+    if (!imgOk) setImageState(InitialState);
   },
   [props]);
 
