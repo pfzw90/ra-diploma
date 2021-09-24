@@ -1,4 +1,6 @@
-import { CHANGE_QUANTITY, GET_ITEM_DETAILS, SELECT_SIZE } from '../actions/actionTypes';
+import {
+  ADD_CART_TOOLTIP, CHANGE_QUANTITY, GET_ITEM_DETAILS, SELECT_SIZE,
+} from '../actions/actionTypes';
 
 const initialState = {
   itemState: 'loading',
@@ -32,10 +34,27 @@ export default function itemDetailsReducer(state = initialState, action) {
       };
 
     case CHANGE_QUANTITY:
+      if (action.payload === 'inc') {
+        return {
+          ...state,
+          selectedQuantity: state.selectedQuantity + 1,
+        };
+      }
+      if (action.payload === 'dec') {
+        return {
+          ...state,
+          selectedQuantity: state.selectedQuantity - 1,
+        };
+      }
       return {
         ...state,
-        selectedQuantity: (action.payload === true)
-          ? state.selectedQuantity + 1 : state.selectedQuantity - 1,
+        selectedQuantity: 1,
+      };
+
+    case ADD_CART_TOOLTIP:
+      return {
+        ...state,
+        itemState: action.payload,
       };
 
     default:

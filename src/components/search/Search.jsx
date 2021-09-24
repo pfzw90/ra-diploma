@@ -1,11 +1,14 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import {
   changeSearch, toggleSearchOpacity, initSearch, resetQuery,
 } from '../../actions/actionCreators';
 
 function Search(props) {
   const searchInput = React.createRef();
+  const history = useHistory();
+  const inCatalog = (history.location.pathname.endsWith('catalog'));
 
   useEffect(() => {
     if (!props.hidden && props.header) searchInput.current.focus();
@@ -19,12 +22,12 @@ function Search(props) {
   const handleClick = (ev) => {
     ev.preventDefault();
     const { value, hidden } = props;
-    props.onClick(hidden, value);
+    props.onClick(hidden, value, inCatalog, history);
   };
 
   const handleSubmit = (ev) => {
     ev.preventDefault();
-    props.onSubmit(props.value);
+    props.onSubmit(props.value, inCatalog, history);
   };
 
   const onLeave = () => {
@@ -49,13 +52,19 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => ({
   onChange: (value) => dispatch(changeSearch(value)),
-  onClick: (hidden, value) => {
+  onClick: (hidden, value, inCatalog, history) => {
     if (hidden || !value.length) dispatch(toggleSearchOpacity());
-    else dispatch(initSearch(value));
+    else {
+      if (!inCatalog) history.push('/catalog');
+      dispatch(initSearch(value));
+    }
   },
-  onSubmit: (value) => {
+  onSubmit: (value, inCatalog, history) => {
     if (!value.length) dispatch(resetQuery());
-    else dispatch(initSearch(value));
+    else {
+      if (!inCatalog) history.push('/catalog');
+      dispatch(initSearch(value));
+    }
   },
   onLeave: (value, header) => {
     if (!value && header) dispatch(toggleSearchOpacity());

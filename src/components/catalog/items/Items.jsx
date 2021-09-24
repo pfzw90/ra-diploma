@@ -35,7 +35,7 @@ function Items() {
 
   return (
   <React.Fragment>
-    { (itemsList.length > 0 && itemsState === 'idle') ? (
+    { (itemsList.length > 0) ? (
                 <div className="row">
                 {itemsList.map((i) => (
                 <Item key={nanoid()}

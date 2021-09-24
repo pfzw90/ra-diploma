@@ -11,7 +11,6 @@ import LoadButton from '../../loadbutton/loadButton.jsx';
 function TopSales() {
   const { topsalesList, topsalesState } = useSelector((state) => state.topsales);
   const dispatch = useDispatch();
-  console.log(topsalesState);
 
   const firstLoad = () => {
     dispatch(fetchData(process.env.REACT_APP_TOP_SALES_URL, getTopSales));
@@ -31,7 +30,7 @@ function TopSales() {
                         <div className="row">
                         { topsalesList.map((i) => (
                         <Item key={nanoid()} title={i.title}
-                        price={i.price} id={i.id} img={i.images[0]}/>)) }
+                        price={i.price} id={i.id} img={i.images}/>)) }
                         </div>
 
                 </React.Fragment>

@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import { nanoid } from '@reduxjs/toolkit';
 import Search from '../search/Search.jsx';
+import CartWidget from '../cart/CartWidget.jsx';
 
 const links = [
   { title: 'Главная', alias: '/' },
@@ -32,10 +33,7 @@ function Header({ location }) {
                         <div>
                             <div className="header-controls-pics">
                                 <Search header="true" prefix="header-controls"/>
-                                <div className="header-controls-pic header-controls-cart">
-                                    <div className="header-controls-cart-full">1</div>
-                                    <div className="header-controls-cart-menu"></div>
-                                </div>
+                                <CartWidget/>
                             </div>
                         </div>
                     </div>

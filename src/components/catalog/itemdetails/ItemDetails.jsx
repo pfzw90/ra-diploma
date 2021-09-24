@@ -5,7 +5,7 @@ import { nanoid } from '@reduxjs/toolkit';
 import {
   changeQuantity,
   fetchData, getItemDetails,
-  selectSize,
+  selectSize, addToCart,
 } from '../../../actions/actionCreators';
 import Loader from '../../loader/Loader.jsx';
 import LoadButton from '../../loadbutton/loadButton.jsx';
@@ -25,20 +25,30 @@ function ItemDetails(props) {
   }, [dispatch, props.match.params.id]);
 
   const handleIncQuantity = () => {
-    props.changeQuantity(true);
+    props.changeQuantity('inc');
   };
 
   const handleDecQuantity = () => {
-    props.changeQuantity(false);
+    props.changeQuantity('dec');
   };
 
   const handleSelectSize = (size) => {
     dispatch(props.selectSize(size));
   };
 
-  switch (itemState) {
-    case 'idle':
-      return (
+  const handleBuy = (size, quantity) => {
+    props.addToCart({
+      id: itemData.id,
+      price: itemData.price,
+      title: itemData.title,
+      size,
+      quantity,
+    });
+    props.changeQuantity('reset');
+  };
+
+  if (itemState === 'idle' || itemState === 'additem') {
+    return (
         <React.Fragment>
                    <section className="catalog-item">
                     <h2 className="text-center">{itemData.title}</h2>
@@ -80,7 +90,7 @@ function ItemDetails(props) {
 
                             {(avaliableSizes) ? (
                             <React.Fragment>
-                                <div class="text-center">
+                                <div className="text-center">
                                     <p>Размеры в наличии:
                                     {avaliableSizes.map((s) => <span className={`catalog-item-size ${s === selectedSize ? 'selected' : ''}`} key={nanoid()} onClick={() => handleSelectSize(s)}>{s}</span>)}</p>
                                     <p>Количество: <span className="btn-group btn-group-sm pl-2">
@@ -90,19 +100,23 @@ function ItemDetails(props) {
                                         </span>
                                     </p>
                                 </div>
-                            <button className="btn btn-danger btn-block btn-lg">В корзину</button>
+                            <button className={`btn ${itemState === 'idle' ? 'btn-danger' : 'btn-success'} btn-block btn-lg`}
+                                    onClick={() => handleBuy(selectedSize, selectedQuantity)}
+                                    disabled={itemState !== 'idle'}>
+                                    {itemState === 'idle' ? 'В корзину' : 'Добавлено'}
+                            </button>
                             </React.Fragment>
                             ) : null }
                         </div>
                     </div>
                 </section>
         </React.Fragment>
-      );
-    case 'loading':
-      return <Loader/>;
-    default:
-      return <LoadButton currentState={itemState} fn={firstLoad}/>;
+    );
   }
+  if (itemState === 'loading') {
+    return <Loader/>;
+  }
+  return <LoadButton currentState={itemState} fn={firstLoad}/>;
 }
 
 const mapStateToProps = (state) => {
@@ -121,6 +135,10 @@ const mapDispatchToProps = (dispatch) => ({
   fetchData: (url, fn) => dispatch(fetchData(url, fn)),
   changeQuantity: (inc) => dispatch(changeQuantity(inc)),
   selectSize: (size) => dispatch(selectSize(size)),
+  addToCart: (item) => {
+    dispatch(addToCart(item));
+    dispatch(changeQuantity('reset'));
+  },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ItemDetails);
